@@ -9,7 +9,6 @@ from prettytable import PrettyTable
 import time
 from time import sleep
 
-
 choice = 0
 data_base = "covidDB"
 
@@ -40,7 +39,6 @@ def insert_into_casos(db_file, datos):
     finally:
         BD.close()
 
-    
 def eliminar_duplicados(db_file, fecha_datos):
 
     BD = conn(db_file)
@@ -153,8 +151,6 @@ def new_data():
 
     return success
 
-
-
 def view_today_data(db_file, fecha_datos):
 
     BD = conn(db_file)
@@ -180,8 +176,6 @@ def view_today_data(db_file, fecha_datos):
 
     return datos
 
-
-
 def all_data(db_file, ID):
     
     BD = conn(db_file)
@@ -204,8 +198,6 @@ def all_data(db_file, ID):
 
     return datos
 
-
-
 if __name__ == '__main__':
 
     while True:
@@ -221,7 +213,6 @@ if __name__ == '__main__':
 
             except:
                 print("Valor ingresado invalido. Reintente.")
-
          
         if choice == 1:
 
@@ -244,11 +235,11 @@ if __name__ == '__main__':
             table = PrettyTable(['Casos Nuevos', 'Casos Activos', 'Casos Totales', 'Fecha'])
            
             rows = all_rows(data_base)
+            
             for i in range(1 ,rows + 1):
                 table.add_row(all_data(data_base, i))
 
             print(table)
-
 
         elif choice == 5:
             print("\n Saliendo.....")
