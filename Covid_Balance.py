@@ -9,7 +9,6 @@ from prettytable import PrettyTable
 import time
 from time import sleep
 
-choice = 0
 data_base = "covidDB"
 
 def conn(db_file):
@@ -203,6 +202,7 @@ if __name__ == '__main__':
     while True:
 
         table = PrettyTable(['Casos Nuevos', 'Casos Activos', 'Casos Totales', 'Fecha'])
+        choice = 0
         while True:
 
             print("\n Balance Covid Chile \n")
