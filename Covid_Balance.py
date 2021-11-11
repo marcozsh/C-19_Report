@@ -39,7 +39,7 @@ def insert_into_casos(db_file, datos):
     finally:
         BD.close()
 
-def eliminar_duplicados(db_file, fecha_datos):
+def delete_duplicates(db_file, fecha_datos):
 
     BD = conn(db_file)
     fecha_tabla = [fecha_datos]
@@ -61,7 +61,7 @@ def eliminar_duplicados(db_file, fecha_datos):
     return fecha
 
 
-def fecha_datos():
+def data_date():
 
     url = 'https://www.emol.com/especiales/2020/internacional/coronavirus/casos-chile.asp'
 
@@ -130,13 +130,13 @@ def new_data():
 
     success = False
 
-    fecha_hoy = fecha_datos()
+    fecha_hoy = data_date()
 
-    consulta_duplicados = eliminar_duplicados(data_base,fecha_hoy)
+    consulta_duplicados = delete_duplicates(data_base,fecha_hoy)
 
     if consulta_duplicados == None:
         
-        insert_into_casos(data_base, cifras_covid(fecha_datos()))
+        insert_into_casos(data_base, cifras_covid(data_date()))
         success = True
     
     elif fecha_hoy == consulta_duplicados[0]:
@@ -145,13 +145,13 @@ def new_data():
 
     else:
         
-        insert_into_casos(data_base, cifras_covid(fecha_datos()))
+        insert_into_casos(data_base, cifras_covid(data_date()))
 
 
 
     return success
 
-def view_today_data(db_file, fecha_datos):
+def view_data(db_file, fecha_datos):
 
     BD = conn(db_file)
 
@@ -202,6 +202,7 @@ if __name__ == '__main__':
 
     while True:
 
+        table = PrettyTable(['Casos Nuevos', 'Casos Activos', 'Casos Totales', 'Fecha'])
         while True:
 
             print("\n Balance Covid Chile \n")
@@ -212,6 +213,7 @@ if __name__ == '__main__':
                 break;
 
             except:
+
                 print("Valor ingresado invalido. Reintente.")
          
         if choice == 1:
@@ -221,19 +223,31 @@ if __name__ == '__main__':
 
         elif choice == 2:
 
-            table = PrettyTable(['Casos Nuevos', 'Casos Activos', 'Casos Totales', 'Fecha'])
-            table.add_row(view_today_data(data_base,fecha_datos()))
+            table.add_row(view_data(data_base,data_date()))
 
             print(table)
 
         elif choice == 3:
 
-            print("\n soon..")
+            date = None
+
+            while True:
+                try:
+                    print("\n ej: 20 de noviembre, 2021")
+
+                    date = input("\n Ingrese la fecha a consultar: ")
+
+                    table.add_row(view_data(data_base, date))
+
+                    print(table)
+                    break;
+
+                except:
+                    print("\n Fecha no registrada en la base de datos")
+
 
         elif choice == 4:
 
-            table = PrettyTable(['Casos Nuevos', 'Casos Activos', 'Casos Totales', 'Fecha'])
-           
             rows = all_rows(data_base)
             
             for i in range(1 ,rows + 1):
