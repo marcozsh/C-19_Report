@@ -11,6 +11,8 @@ from time import sleep
 
 data_base = "covidDB"
 
+data_date = time.strftime("%d-%m-%y", time.localtime())
+
 def conn(db_file):
 
     conn = None
@@ -60,21 +62,6 @@ def delete_duplicates(db_file, fecha_datos):
     return fecha
 
 
-def data_date():
-
-    url = 'https://www.emol.com/especiales/2020/internacional/coronavirus/casos-chile.asp'
-
-    page = requests.get(url, verify=False)
-
-    soup = BeautifulSoup(page.content, 'html.parser')
-
-    fecha_de_los_datos = soup.find("div", {"class":"header_nota_tabla"})
-
-    fecha_datos = (fecha_de_los_datos.text[33:-1] +', '+ time.strftime("%Y", time.localtime()))
-
-
-    return fecha_datos
-
 def all_rows(db_file):
 
     BD = conn(db_file)
@@ -119,8 +106,12 @@ def cifras_covid(fecha_datos):
     casos_totales = (datos[13] + datos[14]+ datos[15] 
                     + datos[16]+ datos[17]+ datos[18] + datos[19]+ datos[20]+ datos[21])
 
-    resumen = [ID, casos_nuevos,casos_activos,casos_totales,fecha_datos] 
-     
+    formated_CN = casos_nuevos.replace(".", ",")
+    formated_CA = casos_activos.replace(".", ",")
+    formated_CT = casos_totales.replace(".", ",")
+
+    resumen = [ID, formated_CN,formated_CA,formated_CT,fecha_datos] 
+    
 
     return resumen
 
@@ -129,13 +120,14 @@ def new_data():
 
     success = False
 
-    fecha_hoy = data_date()
+    fecha_hoy = data_date
 
     consulta_duplicados = delete_duplicates(data_base,fecha_hoy)
 
     if consulta_duplicados == None:
         
-        insert_into_casos(data_base, cifras_covid(data_date()))
+        insert_into_casos(data_base, cifras_covid(fecha_hoy))
+        
         success = True
     
     elif fecha_hoy == consulta_duplicados[0]:
@@ -144,8 +136,7 @@ def new_data():
 
     else:
         
-        insert_into_casos(data_base, cifras_covid(data_date()))
-
+        insert_into_casos(data_base, cifras_covid(data_date))
 
 
     return success
@@ -154,18 +145,15 @@ def view_data(db_file, fecha_datos):
 
     BD = conn(db_file)
 
-    fecha_tabla = [fecha_datos]
+    a = [fecha_datos]
 
     try:
         
         cursor = BD.cursor()
 
-        datos = cursor.execute("select nuevos, activos, total, fecha from casos where fecha = (?)", fecha_tabla) 
+        datos = cursor.execute("select nuevos, activos, total, fecha from casos where fecha = (?)", a) 
 
         datos = cursor.fetchone()
-
-        success = True
-
 
     except Error as e:
         print(e)
@@ -223,7 +211,7 @@ if __name__ == '__main__':
 
         elif choice == 2:
 
-            table.add_row(view_data(data_base,data_date()))
+            table.add_row(view_data(data_base,data_date))
 
             print(table)
 
@@ -233,12 +221,10 @@ if __name__ == '__main__':
 
             while True:
                 try:
-                    print("\n ej: 20 de noviembre, 2021")
+                    print("\n ej: 15-11-21")
 
                     date = input("\n Ingrese la fecha a consultar: ")
-
                     table.add_row(view_data(data_base, date))
-
                     print(table)
                     break;
 
